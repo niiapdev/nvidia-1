@@ -1,0 +1,4 @@
+vkbottle
+yt-dlp
+faster-whisper
+ffmpeg-python
