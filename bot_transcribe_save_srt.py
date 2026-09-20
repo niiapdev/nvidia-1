@@ -26,10 +26,8 @@ async def _notify_done(job: "Job"):
         logger.error(f"Failed to send notify_done: {exc}")
 
 
-async def _notify_progress(message: str, user_id: int = None):
+async def _notify_progress(message: str, user_id: int):
     try:
-        if user_id is None:
-            user_id = message.from_user.id if hasattr(message, 'from_user.id') else message.user_id
         await bot.api.messages.send(
             peer_id=user_id,
             random_id=0,
@@ -48,25 +46,8 @@ async def handle_link(message):
         source_lang=None,
         target_lang="en",
         translate=True,
-        merge=True,
+        merge=False,
         notify_coro=_notify_progress,
         progress_coro=_notify_progress,
     )
     await message.answer(f"✅ Ссылка принята! Встало в очередь...")
-
-
-@bot.on.message(text="/cancel")
-async def handle_cancel(message):
-    deleted = queue_manager.cancel_user_jobs(message.from_user.id)
-    if deleted > 0:
-        await message.answer(f"❌ Ваши задачи в очереди отменены")
-    else:
-        await message.answer("❌ У вас нет активных задач в очереди")
-
-
-async def start_bot():
-    await bot.run_polling()
-
-
-if __name__ == "__main__":
-    asyncio.run(start_bot())
